@@ -100,8 +100,8 @@ public class CrosshairMovement : MonoBehaviour
 
     }
 
-    public void ToggleAiming(bool toggle) => aiming = toggle; 
+    public void ToggleAiming(bool toggle) => aiming = toggle;
 
-
+    public void ResetPosition() => transform.position = position;
     
 }

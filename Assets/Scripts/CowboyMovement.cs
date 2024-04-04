@@ -86,6 +86,8 @@ public class CowboyMovement : MonoBehaviour
 
                 colorGrid.ToggleDisplay(false);
 
+                crosshairMovement.ResetPosition();
+
                 ClearTurn();
 
                 turnManager.EndTurn();
