@@ -16,6 +16,15 @@ public class CowboyMovement : MonoBehaviour
 
     private ColorGrid colorGrid;
 
+    [SerializeField] private TurnManager turnManager;
+
+    private Shooting shooting;
+    private bool alreadyShot;
+
+    [SerializeField] private CrosshairMovement crosshairMovement;
+
+    [SerializeField] private bool moving;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,61 +32,85 @@ public class CowboyMovement : MonoBehaviour
         wfs = new WaitForSeconds(timeBetweenMoves);
 
         position = transform.position;
-        Debug.Log(position);
+        //Debug.Log(position);
 
         colorGrid = GetComponent<ColorGrid>();
+
+        shooting = GetComponent<Shooting>();
+        alreadyShot = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (moves.Count < maxMoves) 
-        {
-            if (Input.GetKeyDown(KeyCode.A))
+        if(moving)
+        { 
+            if (moves.Count < maxMoves) 
             {
-                AddMovement("left");
+                if (Input.GetKeyDown(KeyCode.A))
+                {
+                    AddMovement("left");
+                }
+                else if (Input.GetKeyDown(KeyCode.D))
+                {
+                    AddMovement("right");
+                }
+                else if (Input.GetKeyDown(KeyCode.S))
+                {
+                    AddMovement("down");
+                }
+                else if (Input.GetKeyDown(KeyCode.W))
+                {
+                    AddMovement("up");
+                }
+                else if(Input.GetKeyDown(KeyCode.E) && !alreadyShot)
+                {
+                    AddMovement("shoot");
+                    crosshairMovement.ToggleAiming(false);
+                    alreadyShot = true;
+                }
             }
-            else if (Input.GetKeyDown(KeyCode.D))
-            {
-                AddMovement("right");
-            }
-            else if (Input.GetKeyDown(KeyCode.S))
-            {
-                AddMovement("down");
-            }
-            else if (Input.GetKeyDown(KeyCode.W))
-            {
-                AddMovement("up");
-            }
-        }
         
 
-        if(Input.GetKeyDown(KeyCode.R)) 
-        {
-            moves = new List<string>();
-            transform.position = position;
-            colorGrid.ClearTiles();
+            if(Input.GetKeyDown(KeyCode.R)) 
+            {
+                moves = new List<string>();
+
+                ClearTurn();
+
+            
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+
+                colorGrid.ToggleDisplay(false);
+
+                ClearTurn();
+
+                turnManager.EndTurn();
+
+            }
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            transform.position = position;
-            colorGrid.ToggleDisplay(false);
-            colorGrid.ClearTiles();
-            StartCoroutine(ExecuteMovesEverySecond());
-        }
-
-
+        shooting.ToggleDisplay(moving);
     }
 
     public void AddMovement(string move)
     {
         if (legalMoves.Contains(move))
         {
-            if(CheckPossibleMove(move))
+            if (CheckPossibleMove(move))
             {
                 moves.Add(move);
-                ExecuteMove(true);
+
+                if (move != "shoot")
+                { 
+                    turnManager.AddMove();
+                    ExecuteMove(true);
+                }
+
+                
             }
         }
     }
@@ -94,6 +127,8 @@ public class CowboyMovement : MonoBehaviour
                 return ((transform.position.y - 48) / 32 >= 0);
             case "up":
                 return ((transform.position.y + 48) / 32 <= 10);
+            case "shoot":
+                return true;
             default:
                 return false;
         }
@@ -135,15 +170,34 @@ public class CowboyMovement : MonoBehaviour
             case "up":
                 transform.position = new Vector2(transform.position.x, transform.position.y + 32);
                 break;
+            case "shoot":
+                shooting.Shoot();
+                break;
             default:
                 break;
         }
 
-        Debug.Log("x: " + ((transform.position.x - 16) / 32) + " y: " + (transform.position.y - 16) / 32);
+        //Debug.Log("x: " + ((transform.position.x - 16) / 32) + " y: " + (transform.position.y - 16) / 32);
 
         if (!display)
             moves.Remove(moves[0]);
     }
 
+    public void PlayTurnOut()
+    {
 
+        StartCoroutine(ExecuteMovesEverySecond());
+    }
+
+    private void ClearTurn()
+    {
+        transform.position = position;
+        turnManager.ClearMoves();
+        colorGrid.ClearTiles();
+        shooting.ResetShooting();
+        alreadyShot = false;
+        crosshairMovement.ToggleAiming(true);
+    }
+
+    public void ToggleMoving(bool toggle) => moving = toggle;
 }

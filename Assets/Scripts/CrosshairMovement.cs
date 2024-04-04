@@ -8,20 +8,21 @@ public class CrosshairMovement : MonoBehaviour
 
 
     private Vector2 position;
+    private bool aiming;
 
     // Start is called before the first frame update
     void Start()
     {
 
         position = transform.position;
-
+        aiming = true;
 
     }
 
     // Update is called once per frame
     void Update()
     {
- 
+        if(aiming)
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 AddMovement("left");
@@ -99,4 +100,8 @@ public class CrosshairMovement : MonoBehaviour
 
     }
 
+    public void ToggleAiming(bool toggle) => aiming = toggle; 
+
+
+    
 }

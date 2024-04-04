@@ -18,8 +18,8 @@ public class InstatiateGrid : MonoBehaviour
         x = 16;
         y = 16;
 
-        Debug.Log(Screen.width);
-        Debug.Log(Screen.height);
+        //Debug.Log(Screen.width);
+        //Debug.Log(Screen.height);
 
         for (int i = 0; i < 10; i++)
         {

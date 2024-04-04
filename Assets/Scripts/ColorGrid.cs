@@ -23,7 +23,7 @@ public class ColorGrid : MonoBehaviour
     {
         if (display)
         {
-            Debug.Log(collision);
+            //Debug.Log(collision);
             tilesLit.Add(collision.GetComponent<SpriteRenderer>());
 
             collision.GetComponent<SpriteRenderer>().color = color;
